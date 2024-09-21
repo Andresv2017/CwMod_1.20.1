@@ -3,7 +3,7 @@
 	"minecraft:geometry": [
 		{
 			"description": {
-				"identifier": "nm_cassowary.geo",
+				"identifier": "geometry.unknown",
 				"texture_width": 64,
 				"texture_height": 64,
 				"visible_bounds_width": 3,
@@ -222,18 +222,6 @@
 								"up": {"uv": [8, 30], "uv_size": [3, 6]},
 								"down": {"uv": [0, 37], "uv_size": [3, -6]}
 							}
-						},
-						{
-							"origin": [-1.475, 5.08086, -11.07115],
-							"size": [2.95, 5, 0],
-							"uv": {
-								"north": {"uv": [32, 0], "uv_size": [3, 5]},
-								"east": {"uv": [0, 0], "uv_size": [0, 5]},
-								"south": {"uv": [3, 32], "uv_size": [3, 5]},
-								"west": {"uv": [0, 0], "uv_size": [0, 5]},
-								"up": {"uv": [0, 0], "uv_size": [3, 0]},
-								"down": {"uv": [0, 0], "uv_size": [3, 0]}
-							}
 						}
 					]
 				},
@@ -310,21 +298,8 @@
 					"name": "hitbox",
 					"parent": "nm_cassowary",
 					"pivot": [0, 8.68658, 0.42252],
-					"rotation": [5, 0, 0],
-					"cubes": [
-						{
-							"origin": [-7, 4, -8.07748],
-							"size": [14, 14, 14],
-							"uv": {
-								"north": {"uv": [39, 0], "uv_size": [11, 25]},
-								"east": {"uv": [0, 0], "uv_size": [28, 25]},
-								"south": {"uv": [39, 25], "uv_size": [11, 25]},
-								"west": {"uv": [0, 25], "uv_size": [28, 25]},
-								"up": {"uv": [28, 0], "uv_size": [11, 28]},
-								"down": {"uv": [28, 56], "uv_size": [11, -28]}
-							}
-						}
-					]
+					"rotation": [5, 0, 0]
+
 				}
 			]
 		}
