@@ -47,11 +47,11 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
 
     private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> event) {
         if (event.isMoving()) {
-            event.getController().setAnimation(RawAnimation.begin().then("cassowary.animation.walk", Animation.LoopType.LOOP));
+            event.getController().setAnimation(RawAnimation.begin().then("walk", Animation.LoopType.LOOP));
             return PlayState.CONTINUE;
         }
 
-        event.getController().setAnimation(RawAnimation.begin().then("cassowary.animation.idle", Animation.LoopType.LOOP));
+        event.getController().setAnimation(RawAnimation.begin().then("idle", Animation.LoopType.LOOP));
         return PlayState.CONTINUE;
     }
 

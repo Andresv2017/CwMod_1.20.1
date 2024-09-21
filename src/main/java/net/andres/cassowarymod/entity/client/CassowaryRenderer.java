@@ -19,7 +19,7 @@ public class CassowaryRenderer extends GeoEntityRenderer<CassowaryEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(CassowaryEntity animatable) {
-        return new ResourceLocation(CassowaryMod.MODID, "textures/entity/nm_cassowary_texture.png");
+        return new ResourceLocation("cassowarymod", "textures/entity/nm_cassowary_texture.png");
     }
 
     @Override

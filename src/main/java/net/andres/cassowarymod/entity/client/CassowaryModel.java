@@ -15,17 +15,17 @@ import javax.swing.text.html.parser.Entity;
 public class CassowaryModel extends GeoModel<CassowaryEntity> {
     @Override
     public ResourceLocation getModelResource(CassowaryEntity cassowaryEntity) {
-        return new ResourceLocation(CassowaryMod.MODID, "geo/cassowary.geo.json");
+        return new ResourceLocation("cassowarymod", "geo/nm_cassowary.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(CassowaryEntity cassowaryEntity) {
-        return new ResourceLocation(CassowaryMod.MODID, "textures/entity/nm_cassowary_texture.png");
+    public ResourceLocation getTextureResource(CassowaryEntity object) {
+        return new ResourceLocation("cassowarymod", "textures/entity/nm_cassowary_texture.png");
     }
 
     @Override
     public ResourceLocation getAnimationResource(CassowaryEntity cassowaryEntity) {
-        return new ResourceLocation(CassowaryMod.MODID, "animations/cassowary.animation.json");
+        return new ResourceLocation("cassowarymod", "animations/nm_cassowary.animation.json");
     }
 
     @Override
