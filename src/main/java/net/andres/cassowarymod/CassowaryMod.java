@@ -1,6 +1,10 @@
 package net.andres.cassowarymod;
 
 import com.mojang.logging.LogUtils;
+import net.andres.cassowarymod.entity.client.CassowaryRenderer;
+import net.andres.cassowarymod.entity.custom.ModEntities;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -33,6 +37,8 @@ public class CassowaryMod
 
         modEventBus.addListener(this::addCreative);
 
+        ModEntities.register(modEventBus);
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -57,6 +63,7 @@ public class CassowaryMod
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
+            EntityRenderers.register(ModEntities.CASSUWARY.get(), CassowaryRenderer::new);
         }
     }
 }
