@@ -34,12 +34,14 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
     }
     public CassowaryEntity(EntityType<? extends PathfinderMob> type, Level world) {
         super(type, world);
-        this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.0, true)); // Ataques
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true)); // Defiende la cría
-        }
 
+        // El Cassowary atacará al jugador al verlo.
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, true)); // Ataque cuerpo a cuerpo
+        this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1.0)); // Se mueve por el mundo
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true)); // El jugador será su objetivo principal
+    }
+
+    // Controlador de animaciones
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this,"controler",0,this::predicate));
