@@ -21,9 +21,6 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    private boolean hasCria = false; // Flag para saber si la hembra tiene una cría cercana
-    private CassowaryEntity cria; // Referencia a la cría si existe
-
     public static AttributeSupplier setAttributes(){
         return PathfinderMob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 16D)
