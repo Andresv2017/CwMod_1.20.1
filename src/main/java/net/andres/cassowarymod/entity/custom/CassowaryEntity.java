@@ -41,7 +41,7 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true)); // El jugador será su objetivo principal
     }
 
-    // Controlador de animaciones
+    // Controlador de Animaciones
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this,"controler",0,this::predicate));
