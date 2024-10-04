@@ -560,9 +560,10 @@
 				}
 			}
 		},
-		"kick ": {
+		"kick": {
 			"animation_length": 1.25,
 			"override_previous_animation": true,
+			"transition_length": 0,
 			"bones": {
 				"nm_cassowary": {
 					"rotation": {
@@ -1324,6 +1325,8 @@
 		},
 		"beak_attack": {
 			"animation_length": 1.25,
+			"transition_length": 0,
+			"override_previous_animation": true,
 			"bones": {
 				"rightLeg": {
 					"relative_to": {
