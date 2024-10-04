@@ -44,6 +44,10 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
     // Definimos un campo para el cooldown de ataque y el contador de ataques
 
 
+    // Definimos un campo para el cooldown de ataque y el contador de ataques
+    private int attackCooldown = 0;
+    private int attackCounter = 0;
+
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this, "controller", 10, event -> {
             // Si la entidad está moviéndose, reproducir la animación de caminar
@@ -54,8 +58,21 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
 
             // Si la entidad es agresiva (está atacando)
             if (this.isAggressive()) {
-                // Ejecuta la animación de ataque con el pico (beak_attack)
-                event.getController().setAnimation(RawAnimation.begin().thenPlay("beak_attack"));
+                // Reducir el cooldown de ataque con cada tick
+                if (attackCooldown > 0) {
+                    attackCooldown--;
+                } else {
+                    // Si el cooldown ha terminado, ejecutamos un ataque
+                    if (attackCounter < 2) {
+                        event.getController().setAnimation(RawAnimation.begin().thenPlay("beak_attack"));
+                        attackCounter++;
+                    } else {
+                        event.getController().setAnimation(RawAnimation.begin().thenPlay("kick"));
+                        attackCounter = 0; // Reiniciar el contador después de la patada
+                    }
+                    // Establecemos un cooldown antes de permitir otro ataque
+                    attackCooldown = 25;  // Esto representa un cooldown de 20 ticks (1 segundo en Minecraft)
+                }
                 return PlayState.CONTINUE;
             }
 
