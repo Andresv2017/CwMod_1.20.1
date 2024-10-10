@@ -1,6 +1,9 @@
 package net.andres.cassowarymod.entity.custom;
 
 
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
@@ -17,12 +20,19 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import net.minecraft.nbt.CompoundTag;
 
 
 
 public class CassowaryEntity extends Monster implements GeoEntity {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(IS_ATTACKING, false);  // Inicializar con 'false'
+    }
 
     public static AttributeSupplier setAttributes(){
         return PathfinderMob.createMobAttributes()
@@ -50,12 +60,14 @@ public class CassowaryEntity extends Monster implements GeoEntity {
 
     private static final RawAnimation CS_IDLE = RawAnimation.begin().thenLoop("idle");
 
+    private static final RawAnimation CS_BEAK_ATTACK = RawAnimation.begin().thenLoop("beak_attack");
+
 
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "Normal", 5, this::movementPredicate) });
-        //controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "attacking", 4, this::attackingPredicate) });
+        controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "normal", 5, this::movementPredicate) });
+        controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "attacking", 5, this::attackPredicate) });
         //controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "procedure", 4, this::procedurePredicate) });
     }
 
@@ -63,31 +75,60 @@ public class CassowaryEntity extends Monster implements GeoEntity {
     protected <E extends CassowaryEntity> PlayState movementPredicate(AnimationState<E> event) {
         if (this.getDeltaMovement().horizontalDistance() > 1.0E-6D && !this.isInWater()) {
             if (isSprinting()) {
-                System.out.println("Ejecutando animación: SPRINT");
+                //System.out.println("Ejecutando animación: SPRINT");
                 event.setAndContinue(CS_SPRINT);
                 event.getController().setAnimationSpeed(2.0D);
                 return PlayState.CONTINUE;
             }
             if (event.isMoving()) {
-                System.out.println("Ejecutando animación: WALK");
+                //System.out.println("Ejecutando animación: WALK");
                 event.setAndContinue(CS_WALK);
                 event.getController().setAnimationSpeed(1.0D);
                 return PlayState.CONTINUE;
             }
         }
         if (isInWater()) {
-            System.out.println("Ejecutando animación: SWIM");
+            //System.out.println("Ejecutando animación: SWIM");
             event.setAndContinue(CS_SWIM);
             event.getController().setAnimationSpeed(1.0D);
             return PlayState.CONTINUE;
         }
         if (!isInWater()) {
-            System.out.println("Ejecutando animación: IDLE");
+            //System.out.println("Ejecutando animación: IDLE");
             event.setAndContinue(CS_IDLE);
             event.getController().setAnimationSpeed(1.0D);
         }
         return PlayState.CONTINUE;
     }
+
+    private static final EntityDataAccessor<Boolean> IS_ATTACKING = SynchedEntityData.defineId(CassowaryEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public void setIsAttacking(boolean attacking) {
+        this.entityData.set(IS_ATTACKING, attacking);
+    }
+
+    public boolean isAttacking() {
+        return this.entityData.get(IS_ATTACKING);
+    }
+    public void performAttack() {
+        this.setIsAttacking(true); // El mob está atacando
+        // Realiza el ataque
+
+        // Espera un pequeño tiempo antes de restablecer el estado
+        // Un temporizador o esperar algunos ticks en el juego sería lo ideal
+        this.level().getServer().execute(() -> {
+            this.setIsAttacking(false); // El mob ha terminado de atacar
+        });
+    }
+
+    protected <E extends CassowaryEntity> PlayState attackPredicate(AnimationState<E> event) {
+        if (this.isAttacking() && event.getController().getAnimationState().equals(AnimationController.State.PAUSED)) {
+            return event.setAndContinue(CS_BEAK_ATTACK);
+        }
+        System.out.println("Ejecutando animación: Attack");
+        return PlayState.CONTINUE;
+    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
