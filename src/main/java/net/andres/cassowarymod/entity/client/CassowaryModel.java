@@ -28,7 +28,7 @@ public class CassowaryModel extends GeoModel<CassowaryEntity> {
         return new ResourceLocation("cassowarymod", "animations/nm_cassowary.animation.json");
     }
 
-    @Override
+    //@Override
     public void setCustomAnimations(CassowaryEntity animatable, long instanceId, AnimationState<CassowaryEntity> animationState) {
         CoreGeoBone head = getAnimationProcessor().getBone("h_head");
         if(head != null){

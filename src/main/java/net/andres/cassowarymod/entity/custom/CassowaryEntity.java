@@ -8,18 +8,19 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
-import software.bernie.geckolib.core.animation.AnimationController;
 
 
 
-public class CassowaryEntity extends PathfinderMob implements GeoEntity {
+public class CassowaryEntity extends Monster implements GeoEntity {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -31,73 +32,66 @@ public class CassowaryEntity extends PathfinderMob implements GeoEntity {
                 .add(Attributes.MOVEMENT_SPEED, 0.4f)
                 .build();
     }
-    public CassowaryEntity(EntityType<? extends PathfinderMob> type, Level world) {
+    public CassowaryEntity(EntityType<? extends Monster> type, Level world) {
         super(type, world);
 
         // El Cassowary atacará al jugador al verlo.
-        this.goalSelector.addGoal(1, new CustomMeleeAttackGoal(this, 1.0, true)); // Ataque cuerpo a cuerpo
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, true)); // Ataque cuerpo a cuerpo
         this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1.0)); // Se mueve por el mundo
         this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true)); // Atacar jugadores
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, true)); // Atacar otros mobs
     }
 
-    // Definimos un campo para el cooldown de ataque y el contador de ataques
+    private static final RawAnimation CS_SPRINT = RawAnimation.begin().thenLoop("walk");
+
+    private static final RawAnimation CS_WALK = RawAnimation.begin().thenLoop("walk");
+
+    private static final RawAnimation CS_SWIM = RawAnimation.begin().thenLoop("walk");
+
+    private static final RawAnimation CS_IDLE = RawAnimation.begin().thenLoop("idle");
 
 
-    // Definimos un campo para el cooldown de ataque y el contador de ataques
-    private int attackCooldown = 0;
-    private int attackCounter = 0;
 
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "controller", 10, event -> {
-            // Si la entidad está moviéndose, reproducir la animación de caminar
-            if (event.isMoving()) {
-                event.getController().setAnimation(RawAnimation.begin().thenPlay("walk"));
-                return PlayState.CONTINUE;
-            }
-
-            // Si la entidad es agresiva (está atacando)
-            if (this.isAggressive()) {
-                // Reducir el cooldown de ataque con cada tick
-                if (attackCooldown > 0) {
-                    attackCooldown--;
-                } else {
-                    // Si el cooldown ha terminado, ejecutamos un ataque
-                    if (attackCounter < 2) {
-                        event.getController().setAnimation(RawAnimation.begin().thenPlay("beak_attack"));
-                        attackCounter++;
-                    } else {
-                        event.getController().setAnimation(RawAnimation.begin().thenPlay("kick"));
-                        attackCounter = 0; // Reiniciar el contador después de la patada
-                    }
-                    // Establecemos un cooldown antes de permitir otro ataque
-                    attackCooldown = 25;  // Esto representa un cooldown de 20 ticks (1 segundo en Minecraft)
-                }
-                return PlayState.CONTINUE;
-            }
-
-            // Si no está atacando ni moviéndose, reproducir la animación de idle
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("idle"));
-            return PlayState.CONTINUE;
-        }));
+        controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "Normal", 5, this::movementPredicate) });
+        //controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "attacking", 4, this::attackingPredicate) });
+        //controllerRegistrar.add(new AnimationController[] { new AnimationController((GeoAnimatable)this, "procedure", 4, this::procedurePredicate) });
     }
 
 
+    protected <E extends CassowaryEntity> PlayState movementPredicate(AnimationState<E> event) {
+        if (this.getDeltaMovement().horizontalDistance() > 1.0E-6D && !this.isInWater()) {
+            if (isSprinting()) {
+                System.out.println("Ejecutando animación: SPRINT");
+                event.setAndContinue(CS_SPRINT);
+                event.getController().setAnimationSpeed(2.0D);
+                return PlayState.CONTINUE;
+            }
+            if (event.isMoving()) {
+                System.out.println("Ejecutando animación: WALK");
+                event.setAndContinue(CS_WALK);
+                event.getController().setAnimationSpeed(1.0D);
+                return PlayState.CONTINUE;
+            }
+        }
+        if (isInWater()) {
+            System.out.println("Ejecutando animación: SWIM");
+            event.setAndContinue(CS_SWIM);
+            event.getController().setAnimationSpeed(1.0D);
+            return PlayState.CONTINUE;
+        }
+        if (!isInWater()) {
+            System.out.println("Ejecutando animación: IDLE");
+            event.setAndContinue(CS_IDLE);
+            event.getController().setAnimationSpeed(1.0D);
+        }
+        return PlayState.CONTINUE;
+    }
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
     }
-
-    private static class CustomMeleeAttackGoal extends MeleeAttackGoal {
-        private final CassowaryEntity cassowary;
-
-        public CustomMeleeAttackGoal(CassowaryEntity cassowary, double speedModifier, boolean followingTargetEvenIfNotSeen) {
-            super(cassowary, speedModifier, followingTargetEvenIfNotSeen);
-            this.cassowary = cassowary;
-        }
-    }
-
-
 
 }
 
